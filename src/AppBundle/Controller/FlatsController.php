@@ -24,14 +24,30 @@ class FlatsController extends FOSRestController
 {
 
     /**
+     * The doctrine bundle name
+     */
+    const FLATS_BUNDLE = 'AppBundle:Flats';
+    
+    /**
      * @Rest\Get("/flats")
      */
     public function getAction()
     {
-        $restresult = $this->getDoctrine()->getRepository('AppBundle:Flats')->findAll();
-        if ($restresult === null || count($restresult) == 0) {
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findAll();
+        if ($result === null || count($result) == 0) {
             return new View('There a no flats', Response::HTTP_NOT_FOUND);
         }
-        return $restresult;
+        return $result;
+    }
+    
+    /**
+     * @Rest\Get("/flats/{id}")
+     */
+    public function idAction($id) {
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->find($id);
+        if ($result === null || count($result) == 0) {
+            return new View('Flat not found', Response::HTTP_NOT_FOUND);
+        }
+        return $result;
     }
 }
