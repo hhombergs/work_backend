@@ -26,5 +26,6 @@
 /var/cache/test/pools/xP6FHLUS4Z/
 /var/cache/test/twig/c8/
 /var/cache/test/twig/da/
-
-
+/var/cache/dev/twig/95/
+/var/cache/dev/profiler/
+/var/cache/dev/jms_serializer/
