@@ -1,0 +1,9 @@
+/composer.lock
+/nbproject/private/
+/var/logs/dev.log
+/var/bootstrap.php.cache
+/var/SymfonyRequirements.php
+/php_errors.log
+/vendor
+/var/logs/test.log
+/nbproject/
