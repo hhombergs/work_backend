@@ -16,3 +16,5 @@ When you are using the Postgresql server you must install the pdo_pgsql extensio
 After you have made the needed changes run make from the repro main dir.
 After the make process is finished run php bin/console server:run to start the REST Backend service without the need for a HTTP server 
 (i.e. apache or nginx)
+
+Version 1.0
