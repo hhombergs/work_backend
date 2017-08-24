@@ -23,3 +23,5 @@
 /var/cache/dev/twig/*
 /var/cache/dev/profiler/
 /var/cache/dev/jms_serializer/
+/var/cache/test/jms_serializer/*
+
