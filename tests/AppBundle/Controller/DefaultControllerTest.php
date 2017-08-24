@@ -11,8 +11,8 @@ class DefaultControllerTest extends WebTestCase
         $client = static::createClient();
 
         $crawler = $client->request('GET', '/');
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('Access forbidden', $crawler->filter('#container h1')->text());
+        $response = $client->getResponse();
+        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertContains('Access forbidden', $response->getContent());
     }
 }
