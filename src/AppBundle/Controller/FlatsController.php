@@ -18,6 +18,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use FOS\RestBundle\View\View;
 use AppBundle\Entity\Flats;
@@ -67,11 +68,28 @@ class FlatsController extends FOSRestController
         if ($flat->getToken() !== $token) {
             throw new AccessDeniedHttpException('Access forbidden');
         }
-        $flat = $this->buildUserData($flat, $request);
+        $flat = $this->buildFlatData($flat, $request);
         $sn->flush();
         return new View("User Updated Successfully", Response::HTTP_OK);
     }
 
+    /**
+     * @Rest\Post("/flats/")
+     */
+    public function postAction(Request $request) {
+        $data = new Flats();
+        $data = $this->buildFlatData($data, $request);
+        if (empty($data->getCity()) || empty($data->getContactEmail()) || empty($data->getCountry()) || empty($data->getStreet()) || empty($data->getZip())) {
+            throw new NotAcceptableHttpException('NULL VALUES ARE NOT ALLOWED');
+        }
+        $data->setEnterDate(new \DateTime());
+        $data->setToken(uniqid('', TRUE));
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($data);
+        $em->flush();
+        return new View("User Added Successfully", Response::HTTP_OK);
+  }
+    
     /**
      * @Rest\Delete("/flats/{id}/{token}")
      */
@@ -80,10 +98,10 @@ class FlatsController extends FOSRestController
         $sn = $this->getDoctrine()->getManager();
         $flat = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->find($id);
         if ($flat === null || count($flat) == 0) {
-            return new View('Flat not found', Response::HTTP_NOT_FOUND);
+            throw new NotFoundHttpException('Flat not found');
         }
         if ($flat->getToken() !== $token) {
-            return new View('Access forbidden', Response::HTTP_FORBIDDEN);
+            throw new AccessDeniedHttpException('Access forbidden');
         }
         $sn->remove($flat);
         $sn->flush();
@@ -97,7 +115,7 @@ class FlatsController extends FOSRestController
      * @param Request $request
      * @return \AppBundle\Entity\Flats
      */
-    private function buildUserData(\AppBundle\Entity\Flats $flat, Request $request)
+    private function buildFlatData(\AppBundle\Entity\Flats $flat, Request $request)
     {
         $street = $request->get('street');
         $zip = $request->get('zip');
