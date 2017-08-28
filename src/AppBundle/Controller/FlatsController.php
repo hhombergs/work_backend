@@ -1,4 +1,4 @@
-<?php
+www.hr1.de<?php
 /**
  * Handle the REST API calls for the flats table
  *
@@ -34,14 +34,32 @@ class FlatsController extends FOSRestController
     /**
      * @Rest\Get("/flats")
      */
-    public function getAction()
+    public function getAction(Request $request)
     {
-        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findAll();
+        $sort = $request->get('sort');
+        $order = $request->get('order');
+        $start = $request->get('_start');
+        $end = $request->get('_end');
+        if (empty($sort)) {
+            $sort = 'id';
+        }
+        if (empty($order)) {
+            $order = 'DESC';
+        }
+        if (empty($start)) {
+            $start = 0;
+        }
+        if (empty($end)) {
+            $end = 25;
+        }
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy([], [$ort=>$order]);
         if ($result === null || count($result) == 0) {
             throw new NotFoundHttpException('There a no flats');
         }
+        $counter = count($result);
+        $result = array_slice($result, $start, $end);
         $view = View::create();
-        $view->setData($result)->setHeader('X-Total-Count', count($result))
+        $view->setData($result)->setHeader('X-Total-Count', $counter)
             ->setHeader('Access-Control-Expose-Headers', 'X-Total-Count')->setStatusCode(Response::HTTP_OK);
         return $view;
     }
