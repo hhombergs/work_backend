@@ -40,7 +40,10 @@ class FlatsController extends FOSRestController
         if ($result === null || count($result) == 0) {
             throw new NotFoundHttpException('There a no flats');
         }
-        return $result;
+        $view = View::create();
+        $view->setData($result)->setHeader('X-Total-Count', count($result))
+            ->setHeader('Access-Control-Expose-Headers', 'X-Total-Count')->setStatusCode(Response::HTTP_OK);
+        return $view;
     }
 
     /**
@@ -89,7 +92,7 @@ class FlatsController extends FOSRestController
         $em->flush();
         return new View("User Added Successfully", Response::HTTP_OK);
   }
-    
+
     /**
      * @Rest\Delete("/flats/{id}/{token}")
      */
@@ -110,7 +113,7 @@ class FlatsController extends FOSRestController
 
     /**
      * Build the flat data for insert and update
-     * 
+     *
      * @param \AppBundle\Entity\Flats $flat
      * @param Request $request
      * @return \AppBundle\Entity\Flats
@@ -139,5 +142,5 @@ class FlatsController extends FOSRestController
         }
         return $flat;
     }
-    
+
 }
