@@ -7,6 +7,7 @@
 /vendor
 /var/logs/test.log
 /nbproject/
+/.phpintel/
 /var/cache/dev/*.log
 /var/cache/dev/*.meta
 /var/cache/dev/*.xml

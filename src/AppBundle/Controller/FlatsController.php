@@ -1,4 +1,4 @@
-www.hr1.de<?php
+<?php
 /**
  * Handle the REST API calls for the flats table
  *
@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use FOS\RestBundle\View\View;
 use AppBundle\Entity\Flats;
+use Doctrine\Common\Util\Inflector as Inflector;
 
 class FlatsController extends FOSRestController
 {
@@ -36,8 +37,8 @@ class FlatsController extends FOSRestController
      */
     public function getAction(Request $request)
     {
-        $sort = $request->get('sort');
-        $order = $request->get('order');
+        $sort = $request->get('_sort');
+        $order = $request->get('_order');
         $start = $request->get('_start');
         $end = $request->get('_end');
         if (empty($sort)) {
@@ -52,14 +53,14 @@ class FlatsController extends FOSRestController
         if (empty($end)) {
             $end = 25;
         }
-        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy([], [$ort=>$order]);
-        if ($result === null || count($result) == 0) {
+        $sort = Inflector::camelize($sort);
+        $count = $this->getRowCounter();
+        if (count($count) == 0) {
             throw new NotFoundHttpException('There a no flats');
         }
-        $counter = count($result);
-        $result = array_slice($result, $start, $end);
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy([], [$sort=>$order], $end, $start);
         $view = View::create();
-        $view->setData($result)->setHeader('X-Total-Count', $counter)
+        $view->setData($result)->setHeader('X-Total-Count', $count)
             ->setHeader('Access-Control-Expose-Headers', 'X-Total-Count')->setStatusCode(Response::HTTP_OK);
         return $view;
     }
@@ -90,6 +91,7 @@ class FlatsController extends FOSRestController
             throw new AccessDeniedHttpException('Access forbidden');
         }
         $flat = $this->buildFlatData($flat, $request);
+        $sn->merge($flat);
         $sn->flush();
         return new View("User Updated Successfully", Response::HTTP_OK);
     }
@@ -132,17 +134,25 @@ class FlatsController extends FOSRestController
     /**
      * Build the flat data for insert and update
      *
-     * @param \AppBundle\Entity\Flats $flat
+     * @param \AppBundle\Entity\Flats $flat_orig
      * @param Request $request
      * @return \AppBundle\Entity\Flats
      */
-    private function buildFlatData(\AppBundle\Entity\Flats $flat, Request $request)
+    private function buildFlatData(\AppBundle\Entity\Flats $flat_orig, Request $request)
     {
+        $flat = $flat_orig;
+        $enter_date = $request->get('enter_date');
         $street = $request->get('street');
         $zip = $request->get('zip');
         $city = $request->get('city');
         $country = $request->get('country');
         $contact_email = $request->get('contact_email');
+        if (!empty($enter_date)) {
+            $enter_date = new \DateTime($enter_date);
+            $enter_date->add(new \DateInterval('P1D'));
+            $enter_date = new \DateTime($enter_date->format('Y-m-d'));
+            $flat->setEnterDate($enter_date);
+        }
         if (!empty($street)) {
             $flat->setStreet($street);
         }
@@ -161,4 +171,16 @@ class FlatsController extends FOSRestController
         return $flat;
     }
 
+    /**
+     * Get the total row counter
+     *
+     * @return  integer
+     */
+    private function getRowCounter() {
+        $sn = $this->getDoctrine()->getManager();
+        $qb = $sn->createQueryBuilder();
+        $qb->select('count(flats.id)');
+        $qb->from(self::FLATS_BUNDLE,'flats');
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }
