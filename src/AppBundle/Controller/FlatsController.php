@@ -97,7 +97,7 @@ class FlatsController extends FOSRestController
     }
 
     /**
-     * @Rest\Post("/flats/")
+     * @Rest\Post("/flats")
      */
     public function postAction(Request $request) {
         $data = new Flats();
