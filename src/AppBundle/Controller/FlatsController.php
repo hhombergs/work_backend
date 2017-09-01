@@ -93,7 +93,8 @@ class FlatsController extends FOSRestController
         $flat = $this->buildFlatData($flat, $request);
         $sn->merge($flat);
         $sn->flush();
-        return new View("User Updated Successfully", Response::HTTP_OK);
+        $view = View::create();
+        $view->setData($flat)->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -110,7 +111,36 @@ class FlatsController extends FOSRestController
         $em = $this->getDoctrine()->getManager();
         $em->persist($data);
         $em->flush();
-        return new View("User Added Successfully", Response::HTTP_OK);
+        $email = [
+            'id' => $data->getId(),
+            'token'=> $data->getToken(),
+            'street' => $data->getStreet(),
+            'zip' => $data->getZip(),
+            'city' => $data->getCity(),
+            'country' => $data->getCountry(),
+        ];
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Wohnung erstellt')
+            ->setFrom('send@example.com')
+            ->setTo($data->getContactEmail())
+            ->setBody(
+                $this->renderView(
+                    'emails/create.html.twig',
+                    $email
+                )
+            )
+            ->addPart(
+                $this->renderView(
+                    'emails/create.twig',
+                    $email
+                ),
+                'text/plain'
+            )
+        ;
+        $this->get('mailer')->send($message);
+        $view = View::create();
+        $view->setData($data)->setStatusCode(Response::HTTP_OK);
+        return $view;
   }
 
     /**
@@ -128,7 +158,7 @@ class FlatsController extends FOSRestController
         }
         $sn->remove($flat);
         $sn->flush();
-        return new View("Deleted successfully", Response::HTTP_OK);
+        return new View("Wohnung gelöscht", Response::HTTP_OK);
     }
 
     /**
