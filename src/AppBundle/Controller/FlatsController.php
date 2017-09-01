@@ -67,6 +67,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Get("/flats/{id}")
+     * @Rest\Get("/flat/{id}")
      */
     public function idAction($id)
     {
@@ -78,7 +79,17 @@ class FlatsController extends FOSRestController
     }
 
     /**
+     */
+    public function tokenAction($token) {
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy(['token'=>$token]);
+        if ($result === null || count($result) == 0) {
+            throw new NotFoundHttpException('Flat not found');
+        }
+        return $result[0];
+    }
+    /**
      * @Rest\Put("/flats/{id}/{token}")
+     * @Rest\Put("/flat/{id}/{token}")
      */
     public function putAction($id, $token, Request $request)
     {
@@ -93,12 +104,12 @@ class FlatsController extends FOSRestController
         $flat = $this->buildFlatData($flat, $request);
         $sn->merge($flat);
         $sn->flush();
-        $view = View::create();
-        $view->setData($flat)->setStatusCode(Response::HTTP_OK);
+        return new View("Wohnung geändert", Response::HTTP_OK);
     }
 
     /**
      * @Rest\Post("/flats")
+     * @Rest\Post("/flat")
      */
     public function postAction(Request $request) {
         $data = new Flats();
@@ -145,6 +156,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Delete("/flats/{id}/{token}")
+     * @Rest\Delete("/flat/{id}/{token}")
      */
     public function deleteAction($id, $token)
     {
@@ -179,8 +191,6 @@ class FlatsController extends FOSRestController
         $contact_email = $request->get('contact_email');
         if (!empty($enter_date)) {
             $enter_date = new \DateTime($enter_date);
-            $enter_date->add(new \DateInterval('P1D'));
-            $enter_date = new \DateTime($enter_date->format('Y-m-d'));
             $flat->setEnterDate($enter_date);
         }
         if (!empty($street)) {
