@@ -34,6 +34,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Get("/flats")
+     * @Rest\Get("/flat")
      */
     public function getAction(Request $request)
     {
@@ -41,6 +42,7 @@ class FlatsController extends FOSRestController
         $order = $request->get('_order');
         $start = $request->get('_start');
         $end = $request->get('_end');
+        $filterID = $request->get('_filterid');
         if (empty($sort)) {
             $sort = 'id';
         }
@@ -53,12 +55,16 @@ class FlatsController extends FOSRestController
         if (empty($end)) {
             $end = 25;
         }
+        $filter = [];
+        if (!empty($filterID) && $filterID != 'null') {
+            $filter = ['id'=>$filterID];
+        }
         $sort = Inflector::camelize($sort);
-        $count = $this->getRowCounter();
+        $count = $this->getRowCounter($filter);
         if (count($count) == 0) {
             throw new NotFoundHttpException('There a no flats');
         }
-        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy([], [$sort=>$order], $end, $start);
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy($filter, [$sort=>$order], $end, $start);
         $view = View::create();
         $view->setData($result)->setHeader('X-Total-Count', $count)
             ->setHeader('Access-Control-Expose-Headers', 'X-Total-Count')->setStatusCode(Response::HTTP_OK);
@@ -78,15 +84,6 @@ class FlatsController extends FOSRestController
         return $result;
     }
 
-    /**
-     */
-    public function tokenAction($token) {
-        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy(['token'=>$token]);
-        if ($result === null || count($result) == 0) {
-            throw new NotFoundHttpException('Flat not found');
-        }
-        return $result[0];
-    }
     /**
      * @Rest\Put("/flats/{id}/{token}")
      * @Rest\Put("/flat/{id}/{token}")
@@ -111,7 +108,8 @@ class FlatsController extends FOSRestController
      * @Rest\Post("/flats")
      * @Rest\Post("/flat")
      */
-    public function postAction(Request $request) {
+    public function postAction(Request $request)
+    {
         $data = new Flats();
         $data = $this->buildFlatData($data, $request);
         if (empty($data->getCity()) || empty($data->getContactEmail()) || empty($data->getCountry()) || empty($data->getStreet()) || empty($data->getZip())) {
@@ -214,13 +212,20 @@ class FlatsController extends FOSRestController
     /**
      * Get the total row counter
      *
+     * @param array $fiter
      * @return  integer
      */
-    private function getRowCounter() {
+    private function getRowCounter($filter)
+    {
         $sn = $this->getDoctrine()->getManager();
         $qb = $sn->createQueryBuilder();
         $qb->select('count(flats.id)');
         $qb->from(self::FLATS_BUNDLE,'flats');
+        if (count($filter) > 0) {
+            $key = key($filter);
+            $qb->where('flats.' . $key . ' = ?1');
+            $qb->setParameter(1, $filter[$key]);
+        }
         return $qb->getQuery()->getSingleScalarResult();
     }
 }
