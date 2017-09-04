@@ -34,6 +34,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Get("/flats")
+     * @Rest\Get("/flat")
      */
     public function getAction(Request $request)
     {
@@ -41,6 +42,7 @@ class FlatsController extends FOSRestController
         $order = $request->get('_order');
         $start = $request->get('_start');
         $end = $request->get('_end');
+        $filterID = $request->get('_filterid');
         if (empty($sort)) {
             $sort = 'id';
         }
@@ -53,12 +55,16 @@ class FlatsController extends FOSRestController
         if (empty($end)) {
             $end = 25;
         }
+        $filter = [];
+        if (!empty($filterID) && $filterID != 'null') {
+            $filter = ['id'=>$filterID];
+        }
         $sort = Inflector::camelize($sort);
-        $count = $this->getRowCounter();
+        $count = $this->getRowCounter($filter);
         if (count($count) == 0) {
             throw new NotFoundHttpException('There a no flats');
         }
-        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy([], [$sort=>$order], $end, $start);
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy($filter, [$sort=>$order], $end, $start);
         $view = View::create();
         $view->setData($result)->setHeader('X-Total-Count', $count)
             ->setHeader('Access-Control-Expose-Headers', 'X-Total-Count')->setStatusCode(Response::HTTP_OK);
@@ -67,6 +73,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Get("/flats/{id}")
+     * @Rest\Get("/flat/{id}")
      */
     public function idAction($id)
     {
@@ -79,6 +86,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Put("/flats/{id}/{token}")
+     * @Rest\Put("/flat/{id}/{token}")
      */
     public function putAction($id, $token, Request $request)
     {
@@ -93,13 +101,15 @@ class FlatsController extends FOSRestController
         $flat = $this->buildFlatData($flat, $request);
         $sn->merge($flat);
         $sn->flush();
-        return new View("User Updated Successfully", Response::HTTP_OK);
+        return new View("Wohnung geändert", Response::HTTP_OK);
     }
 
     /**
      * @Rest\Post("/flats")
+     * @Rest\Post("/flat")
      */
-    public function postAction(Request $request) {
+    public function postAction(Request $request)
+    {
         $data = new Flats();
         $data = $this->buildFlatData($data, $request);
         if (empty($data->getCity()) || empty($data->getContactEmail()) || empty($data->getCountry()) || empty($data->getStreet()) || empty($data->getZip())) {
@@ -110,11 +120,41 @@ class FlatsController extends FOSRestController
         $em = $this->getDoctrine()->getManager();
         $em->persist($data);
         $em->flush();
-        return new View("User Added Successfully", Response::HTTP_OK);
+        $email = [
+            'id' => $data->getId(),
+            'token'=> $data->getToken(),
+            'street' => $data->getStreet(),
+            'zip' => $data->getZip(),
+            'city' => $data->getCity(),
+            'country' => $data->getCountry(),
+        ];
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Wohnung erstellt')
+            ->setFrom('send@example.com')
+            ->setTo($data->getContactEmail())
+            ->setBody(
+                $this->renderView(
+                    'emails/create.html.twig',
+                    $email
+                )
+            )
+            ->addPart(
+                $this->renderView(
+                    'emails/create.twig',
+                    $email
+                ),
+                'text/plain'
+            )
+        ;
+        $this->get('mailer')->send($message);
+        $view = View::create();
+        $view->setData($data)->setStatusCode(Response::HTTP_OK);
+        return $view;
   }
 
     /**
      * @Rest\Delete("/flats/{id}/{token}")
+     * @Rest\Delete("/flat/{id}/{token}")
      */
     public function deleteAction($id, $token)
     {
@@ -128,7 +168,7 @@ class FlatsController extends FOSRestController
         }
         $sn->remove($flat);
         $sn->flush();
-        return new View("Deleted successfully", Response::HTTP_OK);
+        return new View("Wohnung gelöscht", Response::HTTP_OK);
     }
 
     /**
@@ -149,8 +189,6 @@ class FlatsController extends FOSRestController
         $contact_email = $request->get('contact_email');
         if (!empty($enter_date)) {
             $enter_date = new \DateTime($enter_date);
-            $enter_date->add(new \DateInterval('P1D'));
-            $enter_date = new \DateTime($enter_date->format('Y-m-d'));
             $flat->setEnterDate($enter_date);
         }
         if (!empty($street)) {
@@ -174,13 +212,20 @@ class FlatsController extends FOSRestController
     /**
      * Get the total row counter
      *
+     * @param array $fiter
      * @return  integer
      */
-    private function getRowCounter() {
+    private function getRowCounter($filter)
+    {
         $sn = $this->getDoctrine()->getManager();
         $qb = $sn->createQueryBuilder();
         $qb->select('count(flats.id)');
         $qb->from(self::FLATS_BUNDLE,'flats');
+        if (count($filter) > 0) {
+            $key = key($filter);
+            $qb->where('flats.' . $key . ' = ?1');
+            $qb->setParameter(1, $filter[$key]);
+        }
         return $qb->getQuery()->getSingleScalarResult();
     }
 }
