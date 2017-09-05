@@ -56,7 +56,7 @@ class FlatsController extends FOSRestController
             $end = 25;
         }
         $filter = [];
-        if (!empty($filterID) && $filterID != 'null') {
+        if (!empty($filterID) && $filterID != 'null' && $filterID != 'undefined') {
             $filter = ['id'=>$filterID];
         }
         $sort = Inflector::camelize($sort);
