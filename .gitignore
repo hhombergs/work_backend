@@ -8,6 +8,7 @@
 /var/logs/test.log
 /nbproject/
 /.phpintel/
+/web/bundles/nelmioapidoc/*
 /var/cache/dev/*.log
 /var/cache/dev/*.meta
 /var/cache/dev/*.xml

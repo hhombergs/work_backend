@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use FOS\RestBundle\View\View;
 use AppBundle\Entity\Flats;
 use Doctrine\Common\Util\Inflector as Inflector;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 class FlatsController extends FOSRestController
 {
@@ -35,6 +36,13 @@ class FlatsController extends FOSRestController
     /**
      * @Rest\Get("/flats")
      * @Rest\Get("/flat")
+     * @ApiDoc(
+     *     output="AppBundle\Entity\Flats",
+     *     statusCodes={
+     *         200 = "Returned when successful",
+     *         404 = "Return when not found"
+     *     }
+     * )
      */
     public function getAction(Request $request)
     {
@@ -74,6 +82,13 @@ class FlatsController extends FOSRestController
     /**
      * @Rest\Get("/flats/{id}")
      * @Rest\Get("/flat/{id}")
+     * @ApiDoc(
+     *     output="AppBundle\Entity\Flats",
+     *     statusCodes={
+     *         200 = "Returned when successful",
+     *         404 = "Return when not found"
+     *     }
+     * )
      */
     public function idAction($id)
     {
