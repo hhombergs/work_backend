@@ -8,15 +8,16 @@ use Doctrine\ORM\Mapping as ORM;
  * Flats
  *
  * @ORM\Table(name="flats", indexes={@ORM\Index(name="token_idx", columns={"token"})})
- * @ORM\Entity(repositoryClass="AppBundle\Repository\FlatsRepository")
+ * @ORM\Entity
  */
 class Flats
 {
+
     /**
-     * @var int
+     * @var integer
      *
-     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
+     * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
@@ -24,52 +25,51 @@ class Flats
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="enter_date", type="date")
+     * @ORM\Column(name="enter_date", type="date", nullable=false, options={"default"="NOW()"})
      */
     private $enterDate;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="street", type="string", length=255)
+     * @ORM\Column(name="street", type="string", length=255, nullable=false, options={"default"="''"})
      */
     private $street;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="zip", type="string", length=20)
+     * @ORM\Column(name="zip", type="string", length=20, nullable=false, options={"default"="''"})
      */
     private $zip;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="city", type="string", length=255)
+     * @ORM\Column(name="city", type="string", length=255, nullable=false, options={"default"="''"})
      */
     private $city;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="country", type="string", length=255)
+     * @ORM\Column(name="country", type="string", length=255, nullable=false, options={"default"="''"})
      */
     private $country;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="contact_email", type="string", length=255)
+     * @ORM\Column(name="contact_email", type="string", length=255, nullable=false, options={"default"="''"})
      */
     private $contactEmail;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="token", type="string", length=255)
+     * @ORM\Column(name="token", type="string", length=255, nullable=false, options={"default"="''"})
      */
     private $token;
-
 
     /**
      * Get id
@@ -248,5 +248,6 @@ class Flats
     {
         return $this->token;
     }
+
 }
 
