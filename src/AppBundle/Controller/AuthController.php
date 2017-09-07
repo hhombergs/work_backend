@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * Handle auth request
+ *
+ * @author hhombergs
+ * @category Work
+ * @package Flats
+ * @subpackage Controller
+ * @since 2017-08-23
+ * @copyright Heinz-Gerd Hombergs
+ */
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -12,9 +21,14 @@ use FOS\RestBundle\View\View;
 class AuthController extends Controller
 {
     /**
+     * Check if the authenticate data is correct
+     * 
+     * @param Request $request
+     * @return View
+     * @throws AccessDeniedHttpException
      * @Route("/auth", name="auth")
      */
-    public function authAction(Request $request)
+    public function authAction(Request $request) : View
     {
         $id = $request->get('username');
         $result = $this->getDoctrine()->getRepository('AppBundle:Flats')->find($id);

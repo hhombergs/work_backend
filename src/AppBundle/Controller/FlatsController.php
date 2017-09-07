@@ -7,7 +7,7 @@
  * @package Flats
  * @subpackage Controller
  * @since 2017-08-23
- * @copyright Henz-Gerd Hombergs
+ * @copyright Heinz-Gerd Hombergs
  */
 namespace AppBundle\Controller;
 
