@@ -1,4 +1,14 @@
 <?php
+/**
+ * Handle doctrine ORM access to the database table
+ *
+ * @author hhombergs
+ * @category Work
+ * @package Flats
+ * @subpackage Database
+ * @since 2017-08-23
+ * @copyright Henz-Gerd Hombergs
+ */
 
 namespace AppBundle\Entity;
 
@@ -76,7 +86,7 @@ class Flats
      *
      * @return int
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
@@ -88,7 +98,7 @@ class Flats
      *
      * @return Flats
      */
-    public function setEnterDate($enterDate)
+    public function setEnterDate($enterDate) : Flats
     {
         $this->enterDate = $enterDate;
 
@@ -100,7 +110,7 @@ class Flats
      *
      * @return \DateTime
      */
-    public function getEnterDate()
+    public function getEnterDate() : \DateTime
     {
         return $this->enterDate;
     }
@@ -112,7 +122,7 @@ class Flats
      *
      * @return Flats
      */
-    public function setStreet($street)
+    public function setStreet($street) : Flats
     {
         $this->street = $street;
 
@@ -124,7 +134,7 @@ class Flats
      *
      * @return string
      */
-    public function getStreet()
+    public function getStreet() : string
     {
         return $this->street;
     }
@@ -136,7 +146,7 @@ class Flats
      *
      * @return Flats
      */
-    public function setZip($zip)
+    public function setZip($zip) : Flats
     {
         $this->zip = $zip;
 
@@ -148,7 +158,7 @@ class Flats
      *
      * @return string
      */
-    public function getZip()
+    public function getZip() : string
     {
         return $this->zip;
     }
@@ -160,7 +170,7 @@ class Flats
      *
      * @return Flats
      */
-    public function setCity($city)
+    public function setCity($city) : Flats
     {
         $this->city = $city;
 
@@ -172,7 +182,7 @@ class Flats
      *
      * @return string
      */
-    public function getCity()
+    public function getCity() : string
     {
         return $this->city;
     }
@@ -184,7 +194,7 @@ class Flats
      *
      * @return Flats
      */
-    public function setCountry($country)
+    public function setCountry($country) : Flats
     {
         $this->country = $country;
 
@@ -196,7 +206,7 @@ class Flats
      *
      * @return string
      */
-    public function getCountry()
+    public function getCountry() : string
     {
         return $this->country;
     }
@@ -208,7 +218,7 @@ class Flats
      *
      * @return Flats
      */
-    public function setContactEmail($contactEmail)
+    public function setContactEmail($contactEmail) : Flats
     {
         $this->contactEmail = $contactEmail;
 
@@ -220,7 +230,7 @@ class Flats
      *
      * @return string
      */
-    public function getContactEmail()
+    public function getContactEmail() : string
     {
         return $this->contactEmail;
     }
@@ -232,7 +242,7 @@ class Flats
      *
      * @return Flats
      */
-    public function setToken($token)
+    public function setToken($token) : Flats
     {
         $this->token = $token;
 
@@ -244,7 +254,7 @@ class Flats
      *
      * @return string
      */
-    public function getToken()
+    public function getToken() : string
     {
         return $this->token;
     }

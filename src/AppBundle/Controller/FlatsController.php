@@ -34,17 +34,15 @@ class FlatsController extends FOSRestController
     const FLATS_BUNDLE = 'AppBundle:Flats';
 
     /**
+     * Handle the get request for the complete list
+     * 
+     * @param Request $request
+     * @return View
+     * @throws NotFoundHttpException
      * @Rest\Get("/flats")
      * @Rest\Get("/flato")
-     * @ApiDoc(
-     *     output="AppBundle\Entity\Flats",
-     *     statusCodes={
-     *         200 = "Returned when successful",
-     *         404 = "Return when not found"
-     *     }
-     * )
      */
-    public function getAction(Request $request)
+    public function getAction(Request $request): View
     {
         $sort = $request->get('_sort');
         $order = $request->get('_order');
@@ -65,14 +63,14 @@ class FlatsController extends FOSRestController
         }
         $filter = [];
         if (!empty($filterID) && $filterID != 'null' && $filterID != 'undefined') {
-            $filter = ['id'=>$filterID];
+            $filter = ['id' => $filterID];
         }
         $sort = Inflector::camelize($sort);
         $count = $this->getRowCounter($filter);
         if (count($count) == 0) {
             throw new NotFoundHttpException('There a no flats');
         }
-        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy($filter, [$sort=>$order], $end, $start);
+        $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->findBy($filter, [$sort => $order], $end, $start);
         $view = View::create();
         $view->setData($result)->setHeader('X-Total-Count', $count)
             ->setHeader('Access-Control-Expose-Headers', 'X-Total-Count')->setStatusCode(Response::HTTP_OK);
@@ -80,17 +78,15 @@ class FlatsController extends FOSRestController
     }
 
     /**
+     * Get one flat
+     * 
+     * @param int $id
+     * @return Flats
+     * @throws NotFoundHttpException
      * @Rest\Get("/flats/{id}")
      * @Rest\Get("/flato/{id}")
-     * @ApiDoc(
-     *     output="AppBundle\Entity\Flats",
-     *     statusCodes={
-     *         200 = "Returned when successful",
-     *         404 = "Return when not found"
-     *     }
-     * )
      */
-    public function idAction($id)
+    public function idAction(int $id): Flats
     {
         $result = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->find($id);
         if ($result === null || count($result) == 0) {
@@ -100,10 +96,18 @@ class FlatsController extends FOSRestController
     }
 
     /**
+     * Update the given flat
+     * 
+     * @param int $id
+     * @param string $token
+     * @param Request $request
+     * @return View
+     * @throws NotFoundHttpException
+     * @throws AccessDeniedHttpException
      * @Rest\Put("/flats/{id}/{token}")
      * @Rest\Put("/flato/{id}/{token}")
      */
-    public function putAction($id, $token, Request $request)
+    public function putAction(int $id, string $token, Request $request): View
     {
         $sn = $this->getDoctrine()->getManager();
         $flat = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->find($id);
@@ -120,10 +124,15 @@ class FlatsController extends FOSRestController
     }
 
     /**
+     * Insert a new flat
+     * 
+     * @param Request $request
+     * @return View
+     * @throws NotAcceptableHttpException
      * @Rest\Post("/flats")
      * @Rest\Post("/flato")
      */
-    public function postAction(Request $request)
+    public function postAction(Request $request): View
     {
         $data = new Flats();
         $data = $this->buildFlatData($data, $request);
@@ -137,7 +146,7 @@ class FlatsController extends FOSRestController
         $em->flush();
         $email = [
             'id' => $data->getId(),
-            'token'=> $data->getToken(),
+            'token' => $data->getToken(),
             'street' => $data->getStreet(),
             'zip' => $data->getZip(),
             'city' => $data->getCity(),
@@ -149,29 +158,33 @@ class FlatsController extends FOSRestController
             ->setTo($data->getContactEmail())
             ->setBody(
                 $this->renderView(
-                    'emails/create.html.twig',
-                    $email
+                    'emails/create.html.twig', $email
                 )
             )
             ->addPart(
-                $this->renderView(
-                    'emails/create.twig',
-                    $email
-                ),
-                'text/plain'
+            $this->renderView(
+                'emails/create.twig', $email
+            ), 'text/plain'
             )
         ;
         $this->get('mailer')->send($message);
         $view = View::create();
         $view->setData($data)->setStatusCode(Response::HTTP_OK);
         return $view;
-  }
+    }
 
     /**
+     * Delete the given flat
+     * 
+     * @param int $id
+     * @param string $token
+     * @return View
+     * @throws NotFoundHttpException
+     * @throws AccessDeniedHttpException
      * @Rest\Delete("/flats/{id}/{token}")
      * @Rest\Delete("/flato/{id}/{token}")
      */
-    public function deleteAction($id, $token)
+    public function deleteAction(int $id, string $token): View
     {
         $sn = $this->getDoctrine()->getManager();
         $flat = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->find($id);
@@ -193,7 +206,7 @@ class FlatsController extends FOSRestController
      * @param Request $request
      * @return \AppBundle\Entity\Flats
      */
-    private function buildFlatData(\AppBundle\Entity\Flats $flat_orig, Request $request)
+    private function buildFlatData(\AppBundle\Entity\Flats $flat_orig, Request $request): AppBundle\Entity\Flats
     {
         $flat = $flat_orig;
         $enter_date = $request->get('enter_date');
@@ -227,15 +240,15 @@ class FlatsController extends FOSRestController
     /**
      * Get the total row counter
      *
-     * @param array $fiter
+     * @param array $filter
      * @return  integer
      */
-    private function getRowCounter($filter)
+    private function getRowCounter(array $filter): int
     {
         $sn = $this->getDoctrine()->getManager();
         $qb = $sn->createQueryBuilder();
         $qb->select('count(flats.id)');
-        $qb->from(self::FLATS_BUNDLE,'flats');
+        $qb->from(self::FLATS_BUNDLE, 'flats');
         if (count($filter) > 0) {
             $key = key($filter);
             $qb->where('flats.' . $key . ' = ?1');

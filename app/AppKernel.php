@@ -6,7 +6,12 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 class AppKernel extends Kernel
 {
 
-    public function registerBundles()
+    /**
+     * register all needed bundles
+     * 
+     * @return array
+     */
+    public function registerBundles() : array
     {
         $bundles = [
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
@@ -36,21 +41,42 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
-    public function getRootDir()
+    /**
+     * Get the root dir
+     * 
+     * @return string
+     */
+    public function getRootDir() : string
     {
         return __DIR__;
     }
 
-    public function getCacheDir()
+    /**
+     * Get the cache dir
+     * 
+     * @return string
+     */
+    public function getCacheDir() : string
     {
         return dirname(__DIR__) . '/var/cache/' . $this->getEnvironment();
     }
 
-    public function getLogDir()
+    /**
+     * Get the log dir
+     * 
+     * @return string
+     */
+    
+    public function getLogDir() : string
     {
         return dirname(__DIR__) . '/var/logs';
     }
 
+    /**
+     * Register the needed config yml file
+     * 
+     * @param LoaderInterface $loader
+     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->getRootDir() . '/config/config_' . $this->getEnvironment() . '.yml');
