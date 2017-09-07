@@ -35,7 +35,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Get("/flats")
-     * @Rest\Get("/flat")
+     * @Rest\Get("/flato")
      * @ApiDoc(
      *     output="AppBundle\Entity\Flats",
      *     statusCodes={
@@ -81,7 +81,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Get("/flats/{id}")
-     * @Rest\Get("/flat/{id}")
+     * @Rest\Get("/flato/{id}")
      * @ApiDoc(
      *     output="AppBundle\Entity\Flats",
      *     statusCodes={
@@ -101,7 +101,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Put("/flats/{id}/{token}")
-     * @Rest\Put("/flat/{id}/{token}")
+     * @Rest\Put("/flato/{id}/{token}")
      */
     public function putAction($id, $token, Request $request)
     {
@@ -121,7 +121,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Post("/flats")
-     * @Rest\Post("/flat")
+     * @Rest\Post("/flato")
      */
     public function postAction(Request $request)
     {
@@ -169,7 +169,7 @@ class FlatsController extends FOSRestController
 
     /**
      * @Rest\Delete("/flats/{id}/{token}")
-     * @Rest\Delete("/flat/{id}/{token}")
+     * @Rest\Delete("/flato/{id}/{token}")
      */
     public function deleteAction($id, $token)
     {
