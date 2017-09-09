@@ -5,8 +5,8 @@ parameters:
     database_name: work
     database_user: postgres
     database_password: 123
-    mailer_transport: smtp
+    mailer_transport: gmail
     mailer_host: 127.0.0.1
-    mailer_user: null
-    mailer_password: null
+    mailer_user: corenar.gaeian@gmail.com
+    mailer_password: LbEAEa0FRLn2x0vb
     secret: Watson
