@@ -8,6 +8,7 @@
 /var/logs/test.log
 /nbproject/
 /.phpintel/
+/html/
 /web/bundles/nelmioapidoc/*
 /var/cache/dev/*.log
 /var/cache/dev/*.meta
@@ -23,6 +24,7 @@
 /var/cache/test/pools/*
 /var/cache/test/twig/*
 /var/cache/dev/twig/*
+/var/cache/prod/*
 /var/cache/dev/profiler/
 /var/cache/dev/jms_serializer/
 /var/cache/test/jms_serializer/*

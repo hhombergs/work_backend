@@ -24,6 +24,8 @@ use FOS\RestBundle\View\View;
 use AppBundle\Entity\Flats;
 use Doctrine\Common\Util\Inflector as Inflector;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 
 class FlatsController extends FOSRestController
 {
@@ -35,7 +37,7 @@ class FlatsController extends FOSRestController
 
     /**
      * Handle the get request for the complete list
-     * 
+     *
      * @param Request $request
      * @return View
      * @throws NotFoundHttpException
@@ -79,7 +81,7 @@ class FlatsController extends FOSRestController
 
     /**
      * Get one flat
-     * 
+     *
      * @param int $id
      * @return Flats
      * @throws NotFoundHttpException
@@ -97,7 +99,7 @@ class FlatsController extends FOSRestController
 
     /**
      * Update the given flat
-     * 
+     *
      * @param int $id
      * @param string $token
      * @param Request $request
@@ -125,7 +127,7 @@ class FlatsController extends FOSRestController
 
     /**
      * Insert a new flat
-     * 
+     *
      * @param Request $request
      * @return View
      * @throws NotAcceptableHttpException
@@ -140,7 +142,8 @@ class FlatsController extends FOSRestController
             throw new NotAcceptableHttpException('NULL VALUES ARE NOT ALLOWED');
         }
         $data->setEnterDate(new \DateTime());
-        $data->setToken(uniqid('', TRUE));
+        $uuid4 = Uuid::uuid4();
+        $data->setToken($uuid4->toString());
         $em = $this->getDoctrine()->getManager();
         $em->persist($data);
         $em->flush();
@@ -175,7 +178,7 @@ class FlatsController extends FOSRestController
 
     /**
      * Delete the given flat
-     * 
+     *
      * @param int $id
      * @param string $token
      * @return View
