@@ -9,7 +9,7 @@
 /nbproject/
 /.phpintel/
 /html/
-/web/bundles/nelmioapidoc/*
+/web/bundles/*
 /var/cache/dev/*.log
 /var/cache/dev/*.meta
 /var/cache/dev/*.xml
