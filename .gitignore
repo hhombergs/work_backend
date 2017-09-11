@@ -5,7 +5,7 @@
 /var/SymfonyRequirements.php
 /php_errors.log
 /vendor
-/var/logs/test.log
+/var/logs/*
 /nbproject/
 /.phpintel/
 /html/

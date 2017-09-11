@@ -209,7 +209,7 @@ class FlatsController extends FOSRestController
      * @param Request $request
      * @return \AppBundle\Entity\Flats
      */
-    private function buildFlatData(\AppBundle\Entity\Flats $flat_orig, Request $request): AppBundle\Entity\Flats
+    private function buildFlatData(\AppBundle\Entity\Flats $flat_orig, Request $request): Flats
     {
         $flat = $flat_orig;
         $enter_date = $request->get('enter_date');
