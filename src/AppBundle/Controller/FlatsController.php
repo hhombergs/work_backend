@@ -101,23 +101,19 @@ class FlatsController extends FOSRestController
      * Update the given flat
      *
      * @param int $id
-     * @param string $token
      * @param Request $request
      * @return View
      * @throws NotFoundHttpException
      * @throws AccessDeniedHttpException
-     * @Rest\Put("/flats/{id}/{token}")
-     * @Rest\Put("/flato/{id}/{token}")
+     * @Rest\Put("/flats/{id}")
+     * @Rest\Put("/flato/{id}")
      */
-    public function putAction(int $id, string $token, Request $request): View
+    public function putAction(int $id, Request $request): View
     {
         $sn = $this->getDoctrine()->getManager();
         $flat = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->find($id);
         if ($flat === null || count($flat) == 0) {
             throw new NotFoundHttpException('Flat not found');
-        }
-        if ($flat->getToken() !== $token) {
-            throw new AccessDeniedHttpException('Access forbidden');
         }
         $flat = $this->buildFlatData($flat, $request);
         $sn->merge($flat);
@@ -180,22 +176,18 @@ class FlatsController extends FOSRestController
      * Delete the given flat
      *
      * @param int $id
-     * @param string $token
      * @return View
      * @throws NotFoundHttpException
      * @throws AccessDeniedHttpException
-     * @Rest\Delete("/flats/{id}/{token}")
-     * @Rest\Delete("/flato/{id}/{token}")
+     * @Rest\Delete("/flats/{id}")
+     * @Rest\Delete("/flato/{id}")
      */
-    public function deleteAction(int $id, string $token): View
+    public function deleteAction(int $id): View
     {
         $sn = $this->getDoctrine()->getManager();
         $flat = $this->getDoctrine()->getRepository(self::FLATS_BUNDLE)->find($id);
         if ($flat === null || count($flat) == 0) {
             throw new NotFoundHttpException('Flat not found');
-        }
-        if ($flat->getToken() !== $token) {
-            throw new AccessDeniedHttpException('Access forbidden');
         }
         $sn->remove($flat);
         $sn->flush();
